@@ -237,7 +237,7 @@ void BH1750_ReadLightIntensity(float *light_intensity)
         *light_intensity = 0xFFFF; // Báo lỗi với giá trị bất thư�?ng
     }
 }
-void SendData(UART_HandleTypeDef *huart) {
+/*void SendData(UART_HandleTypeDef *huart) {
 
 
     // Tạo chuỗi chứa các giá trị
@@ -277,7 +277,7 @@ void SendData(UART_HandleTypeDef *huart) {
     HAL_UART_Transmit(huart, (uint8_t *)C2, strlen(C2), HAL_MAX_DELAY);
     HAL_UART_Transmit(huart, (uint8_t *)C3, strlen(C3), HAL_MAX_DELAY);
 
-    }
+    }*/
 int CheckTem()
 {
 	if(temperature < 10 && TemperatureDHT <10)
@@ -365,7 +365,45 @@ int main(void)
 	  DHT22();
 	  SHT40_ReadTemperatureHumidity(&temperature, &humidity);
 	  BH1750_ReadLightIntensity(&light_intensity);
-	  SendData(&huart1);
+	  if(CheckTem() == 1)
+	  	  		  	    	C1 = "Nhiet do Kha thap, Nguy co hu hai cao. Can duy chuyen den noi am ap !\n ";
+	  	  		  	    else if (CheckTem() == 2)
+	  	  		  	    	C1 = "Nhiet do ly tuong, Cay phat trien binh thuong.!\n ";
+	  	  		  	    else if (CheckTem() == 3)
+	  	  		  	    	C1 = "nhiet do cao, Nguy co chay nang. Can lam mat ngay lap tuc.!\n ";
+	  	  		  	    if(CheckHum() == 1 )
+	  	  		  	    	C2 = "Do am thap, so luong hoi nuoc qua it. De xuat phun suong, tuoi nuoc cap am.!\n";
+	  	  		  	    else if(CheckHum() == 2 )
+	  	  		  	    	C2 = "Do am ly tuong, Thich hop cho su phat trien cua cay.!\n";
+	  	  		  	    else if	(CheckHum() == 3 )
+	  	  		  	        C2 = "Do am cao, Canh bao cay de benh va chet.!\n";
+	  	  		  	    if(CheckLight() == 1)
+	  	  		  	    	C3 = "Anh sang yeu, Cay kem phat trien. Canh bao than dai la nhat mau!\n";
+	  	  		  	    else if(CheckLight() ==2 )
+	  	  		  	    	C3 = "Anh sang phu hop, Cay phat trien on dinh!\n";
+	  	  		  	    else if(CheckLight() ==3)
+	  	  		  	    	C3 = "Anh sang tot, Cay phat trien manh me, mau sac dep, chat luong tot!\n";
+	  	  		  	    else
+	  	  		  	    	C3 = "Anh sang manh, Cay quang hop lien tuc, Can han che anh sang.!\n";
+	  	  	snprintf(buffer, sizeof(buffer),
+	  	  	    		 "Lan do thu: %d"
+	  	  	             "\nNhiet do dat: %.2f degC\n"
+	  	  	             "Do am dat: %.2f%%\n"
+	  	  	             "Nhiet do khong khi: %.2fdegC\n"
+	  	  	             "Do am khong khi: %.2f%%\n"
+	  	  	             "Cuong do anh sang: %f Lux\n\n",
+	  	  	             i, TemperatureDHT, HumidityDHT, temperature, HumidityDHT, light_intensity);
+	  	  	    // Gửi chuỗi qua USART
+	  	  		strcat(buffer,C1);
+	  	  		strcat(buffer,C2);
+	  	  		strcat(buffer,C3);
+	  	  	    HAL_UART_Transmit(&huart1, (uint8_t *)buffer, strlen(buffer), HAL_MAX_DELAY);
+	  	  	    Delay_us(100);
+
+	  	  	    //HAL_UART_Transmit(&huart1, (uint8_t *)C1, strlen(C1), HAL_MAX_DELAY);
+	  	  	    //HAL_UART_Transmit(&huart1, (uint8_t *)C2, strlen(C2), HAL_MAX_DELAY);
+	  	  	    //HAL_UART_Transmit(&huart1, (uint8_t *)C3, strlen(C3), HAL_MAX_DELAY);
+
 	  while(!HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0));
 
 	  i++;
